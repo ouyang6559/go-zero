@@ -3,6 +3,7 @@ package cmd
 import (
 	_ "embed"
 	"fmt"
+	"github.com/zeromicro/go-zero/core/logx"
 	"os"
 	"runtime"
 	"strings"
@@ -113,6 +114,16 @@ func init() {
 		runtime.GOOS, runtime.GOARCH)
 
 	rootCmd.SetUsageTemplate(usageTpl)
+
+	externalConfig, err := config.GetExternalConfig()
+	if err != nil {
+		logx.Error(err)
+	}
+	if externalConfig.Style != config.DefaultFormat {
+		config.DefaultFormat = externalConfig.Style
+	}
+	config.DefaultConfigExternal = externalConfig
+
 	rootCmd.AddCommand(api.Cmd, bug.Cmd, docker.Cmd, kube.Cmd, env.Cmd, gateway.Cmd, model.Cmd)
 	rootCmd.AddCommand(migrate.Cmd, quickstart.Cmd, rpc.Cmd, tpl.Cmd, upgrade.Cmd, config.Cmd)
 	rootCmd.Command.AddCommand(cobracompletefig.CreateCompletionSpecCommand())

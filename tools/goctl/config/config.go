@@ -12,10 +12,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// DefaultFormat defines a default naming style
+var DefaultFormat = "gozero"
+
+var DefaultConfigExternal *External
+
 const (
-	// DefaultFormat defines a default naming style
-	DefaultFormat = "gozero"
-	configFile    = "goctl.yaml"
+	configFile = "goctl.yaml"
 )
 
 //go:embed default.yaml
@@ -37,13 +40,15 @@ type (
 
 	External struct {
 		// Model is the configuration for the model code generation.
-		Model Model `yaml:"model,omitempty"`
+		Model Model  `yaml:"model,omitempty"`
+		Style string `yaml:"style,omitempty" `
 	}
 
 	// Model defines the configuration for the model code generation.
 	Model struct {
 		// TypesMap: custom Data Type Mapping Table.
-		TypesMap map[string]ModelTypeMapOption `yaml:"types_map,omitempty" `
+		TypesMap        map[string]ModelTypeMapOption `yaml:"types_map,omitempty" `
+		ModelDatasource ModelDatasourceOption         `yaml:"datasource,omitempty" `
 	}
 
 	// ModelTypeMapOption custom Type Options.
@@ -59,6 +64,20 @@ type (
 
 		// Pkg defines the package of the custom type.
 		Pkg string `yaml:"pkg,omitempty"`
+	}
+
+	// ModelDatasourceOption datasource Options.
+	ModelDatasourceOption struct {
+		PgUrl         string   `yaml:"pg_url,omitempty"`
+		Dir           string   `yaml:"dir,omitempty"`
+		MysqlUrl      string   `yaml:"mysql_url,omitempty"`
+		IgnoreColumns []string `yaml:"ignore_columns,omitempty"`
+	}
+
+	// ModelDatasourceOptionItem datasource item Options.
+	ModelDatasourceOptionItem struct {
+		Url           string   `yaml:"url,omitempty"`
+		IgnoreColumns []string `yaml:"ignore_columns,omitempty"`
 	}
 )
 

@@ -135,14 +135,32 @@ func MySqlDataSource(_ *cobra.Command, _ []string) error {
 }
 
 func mergeColumns(columns []string) []string {
-	set := collection.NewSet()
-	for _, v := range columns {
-		fields := strings.FieldsFunc(v, func(r rune) bool {
-			return r == ','
-		})
-		set.AddStr(fields...)
+	/*	externalConfig, err := config.GetExternalConfig()
+		if err != nil {
+			err = nil
+		}
+		exIgnoreColumns := externalConfig.Model.ModelDatasource.IgnoreColumns*/
+	exIgnoreColumns := config.DefaultConfigExternal.Model.ModelDatasource.IgnoreColumns
+	if len(exIgnoreColumns) > 0 {
+		set := collection.NewSet()
+		for _, v := range exIgnoreColumns {
+			fields := strings.FieldsFunc(v, func(r rune) bool {
+				return r == ','
+			})
+			set.AddStr(fields...)
+		}
+		return set.KeysStr()
+	} else {
+		set := collection.NewSet()
+		for _, v := range columns {
+			fields := strings.FieldsFunc(v, func(r rune) bool {
+				return r == ','
+			})
+			set.AddStr(fields...)
+		}
+		return set.KeysStr()
 	}
-	return set.KeysStr()
+
 }
 
 type pattern map[string]struct{}
@@ -271,8 +289,19 @@ type dataSourceArg struct {
 func fromMysqlDataSource(arg dataSourceArg) error {
 	log := console.NewConsole(arg.idea)
 	if len(arg.url) == 0 {
-		log.Error("%v", "expected data source of mysql, but nothing found")
-		return nil
+		configUrl := config.DefaultConfigExternal.Model.ModelDatasource.MysqlUrl
+		if len(configUrl) == 0 {
+			log.Error("%v", "expected data source of mysql, but nothing found")
+			return nil
+		}
+		arg.url = configUrl
+	}
+
+	//externalConfig, _ := config.GetExternalConfig()
+	//configDir := externalConfig.Model.ModelDatasource.Dir
+	configDir := config.DefaultConfigExternal.Model.ModelDatasource.Dir
+	if len(arg.dir) == 0 && len(configDir) > 0 {
+		arg.dir = configDir
 	}
 
 	if len(arg.tablePat) == 0 {
@@ -330,8 +359,18 @@ func fromMysqlDataSource(arg dataSourceArg) error {
 func fromPostgreSqlDataSource(url string, pattern pattern, dir, schema string, cfg *config.Config, cache, idea, strict bool, ignoreColumns []string) error {
 	log := console.NewConsole(idea)
 	if len(url) == 0 {
-		log.Error("%v", "expected data source of postgresql, but nothing found")
-		return nil
+		configUrl := config.DefaultConfigExternal.Model.ModelDatasource.PgUrl
+		if len(configUrl) == 0 {
+			log.Error("%v", "expected data source of postgresql, but nothing found")
+		}
+		url = configUrl
+	}
+
+	//externalConfig, _ := config.GetExternalConfig()
+	//configDir := externalConfig.Model.ModelDatasource.Dir
+	configDir := config.DefaultConfigExternal.Model.ModelDatasource.Dir
+	if len(dir) == 0 && len(configDir) > 0 {
+		dir = configDir
 	}
 
 	if len(pattern) == 0 {

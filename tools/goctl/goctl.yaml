@@ -1,4 +1,4 @@
-style: "gozero"
+style: "go_zero"
 model:
   types_map:
     bigint:
@@ -157,14 +157,13 @@ model:
       null_type: sql.NullString
       type: string
   datasource:
-    dir: ""
-    pg_url: "postgres://username:password@localhost:5432/dbname?sslmode=disable"
-    mysql_url: "mysql://username:password@localhost:3306/dbname
+    dir: "AAAA33"
+    pg_url: "postgres://postgres:123456@127.0.0.1:5432/laravel-single?sslmode=disable"
+    mysql_url: "root:123456@tcp(127.0.0.1:3306)/laravel-single"
     ignore_columns:
-      - "create_at"
+      - "create_at88"
       - "created_at"
       - "create_time"
       - "update_at"
       - "updated_at"
       - "update_time"
-
